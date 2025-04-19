@@ -3,10 +3,11 @@ from app import db
 from sqlalchemy import Column,Integer,String,DateTime
 
 relationship = db.relationship
+Model = db.Model
 
 
 
-class User(db.Model):
+class User(Model):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     username = Column(String(80), unique=True, nullable=False)
