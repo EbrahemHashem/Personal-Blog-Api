@@ -7,10 +7,9 @@ This module:
 """
 
 from flask import Flask
-
+from .api import api_bp
 # Import extensions
 from .extensions import bcrypt, cors, db, jwt, ma
-
 # Import config
 from config import config_by_name
 
@@ -18,17 +17,9 @@ from config import config_by_name
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
-
     register_extensions(app)
-
     # Register blueprints
-    from .api.auth import auth_bp
-
-    app.register_blueprint(auth_bp)
-
-    from .api import api_bp
-
-    app.register_blueprint(api_bp, url_prefix="/api")
+    app.register_blueprint(api_bp, url_prefix="/")
 
     return app
 

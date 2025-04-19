@@ -25,7 +25,10 @@ def run():
     
 @app.shell_context_processor
 def make_shell_context():
-    return dict(db=db, User=User, Role=Role, Permission=Permission)
+    return dict(db=db, 
+                User=User, 
+                Role=Role, 
+                Permission=Permission)
 
 
 @app.cli.command()
