@@ -1,9 +1,8 @@
-from app import db
-from sqlalchemy import Column, String
 from app.models.base_model import BaseModel
+from sqlalchemy import Column, String
+from app import db
 
 relationship = db.relationship
-Model = db.Model
 
 class User(BaseModel):
     __tablename__ = 'users'

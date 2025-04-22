@@ -5,19 +5,22 @@ This module:
 - Contains create_app()
 - Registers extensions
 """
-
+from app.extensions import migrate
 from flask import Flask
-from .api import api_bp
 # Import extensions
-from .extensions import bcrypt, cors, db, jwt, ma
+from app.extensions import bcrypt, cors, jwt, ma
 # Import config
 from config import config_by_name
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
     register_extensions(app)
+    from .api import api_bp
     # Register blueprints
     app.register_blueprint(api_bp, url_prefix="/")
 
@@ -31,3 +34,4 @@ def register_extensions(app):
     jwt.init_app(app)
     bcrypt.init_app(app)
     cors.init_app(app)
+    migrate.init_app(app, db)

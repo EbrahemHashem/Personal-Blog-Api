@@ -8,6 +8,7 @@ Model = db.Model
 
 class Post(BaseModel):
     __tablename__ = 'posts'
+    
     title = Column(String(255), nullable=False)
     content = Column(Text, nullable=False)
     updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
