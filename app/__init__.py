@@ -1,20 +1,10 @@
-""" Top level module
-
-This module:
-
-- Contains create_app()
-- Registers extensions
-"""
 from app.extensions import migrate
 from flask import Flask
-# Import extensions
 from app.extensions import bcrypt, cors, jwt, ma
-# Import config
 from config import config_by_name
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
-
 
 def create_app(config_name):
     app = Flask(__name__)
