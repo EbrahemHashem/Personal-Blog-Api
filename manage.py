@@ -19,11 +19,9 @@ from app.models.post import Post
 from app.models.comment import Comment
 
 
-app = create_app(os.getenv("FLASK_CONFIG") or "development")
+app = create_app("development")
 migrate = Migrate(app, db)
 
-def run():
-    app.run(app, host='0.0.0.0', port=5000, debug=True)
     
 @app.shell_context_processor
 def make_shell_context():

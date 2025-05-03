@@ -2,6 +2,7 @@ from flask_restx import Api
 from flask import Blueprint
 
 from .user.controller import api as user_ns
+from .auth.controller import api as auth_ns
 
 authorizations = {
     "Bearer":
@@ -19,4 +20,4 @@ api = Api(api_bp, title="API", description="Main routes.", authorizations=author
 
 # API namespaces
 api.add_namespace(user_ns,"/api/user")
-
+api.add_namespace(auth_ns,"/api/auth")
