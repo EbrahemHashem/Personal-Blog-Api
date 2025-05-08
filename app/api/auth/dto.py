@@ -20,3 +20,7 @@ class AuthDto:
         'email': fields.String(required=True, description='User email address'),
         'password': fields.String(required=True, description='User password')
     })
+
+    login_response = api.model('Login Response', {
+        'access_token': fields.String(description='JWT access token')
+    })

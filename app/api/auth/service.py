@@ -26,7 +26,16 @@ class UserService:
 
     def login_user(data):
         user = User.query.filter_by(email=data['email']).first()
+        
         if not user or not check_password_hash(user.password_hash, data['password']):
-            raise ValueError('Invalid email or password')
+            return err_resp('Invalid email or password','user_400', 400)
         access_token = create_access_token(identity=user.id)
-        return {'access_token': access_token}
+        logger.info(f"User logged in: {data['email']}")
+        return {'access_token': access_token}, 200
+    
+    def get_user_profile(user_id):
+        user = User.query.get_or_404(user_id)
+        if not user:
+            return err_resp('User not found', 'user_404', 404)
+        logger.info(f"Profile accessed: {user.username}")
+        return user, 200
