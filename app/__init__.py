@@ -1,17 +1,8 @@
-""" Top level module
-
-This module:
-
-- Contains create_app()
-- Registers extensions
-"""
-
+from app.extensions import migrate, db
 from flask import Flask
-from .api import api_bp
-# Import extensions
-from .extensions import bcrypt, cors, db, jwt, ma
-# Import config
+from app.extensions import bcrypt, cors, jwt, ma
 from config import config_by_name
+from .api import api_bp
 
 
 def create_app(config_name):
@@ -31,3 +22,4 @@ def register_extensions(app):
     jwt.init_app(app)
     bcrypt.init_app(app)
     cors.init_app(app)
+    migrate.init_app(app, db)

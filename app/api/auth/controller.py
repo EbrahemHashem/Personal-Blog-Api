@@ -1,73 +1,80 @@
 from flask import request
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from .dto import AuthDto
+from .service import UserService
 from flask_restx import Resource
 
-from app.utils import validation_error
-
-# Auth modules
-from .service import AuthService
-from .dto import AuthDto
-from .utils import LoginSchema, RegisterSchema
 
 api = AuthDto.api
-auth_success = AuthDto.auth_success
-
-login_schema = LoginSchema()
-register_schema = RegisterSchema()
-
-
-@api.route("/login")
-class AuthLogin(Resource):
-    """ User login endpoint
-    User registers then receives the user's information and access_token
-    """
-
-    auth_login = AuthDto.auth_login
-
-    @api.doc(
-        "Auth login",
-        responses={
-            200: ("Logged in", auth_success),
-            400: "Validations failed.",
-            403: "Incorrect password or incomplete credentials.",
-            404: "Email does not match any account.",
-        },
-    )
-    @api.expect(auth_login, validate=True)
-    def post(self):
-        """ Login using email and password """
-        # Grab the json data
-        login_data = request.get_json()
-
-        # Validate data
-        if (errors := login_schema.validate(login_data)) :
-            return validation_error(False, errors), 400
-
-        return AuthService.login(login_data)
-
+register_model = AuthDto.register_model
+login_model = AuthDto.login_model
+data_resp = AuthDto.data_resp
+error_response = AuthDto.error_response
+login_response = AuthDto.login_response
 
 @api.route("/register")
-class AuthRegister(Resource):
-    """ User register endpoint
-    User registers then receives the user's information and access_token
-    """
-
-    auth_register = AuthDto.auth_register
-
+class Register(Resource):
+    
     @api.doc(
-        "Auth registration",
         responses={
-            201: ("Successfully registered user.", auth_success),
-            400: "Malformed data or validations failed.",
+            200: ("Register Successfully",data_resp),
+            400: ("Possible Messages:'Email already exists','Username already exists'",error_response),
+            403: "Access Denied!",
+            404: "Request Not Found",
+            500: "Unexpected Error Occurred"
         },
+        description="Register a new user"                           
     )
-    @api.expect(auth_register, validate=True)
+    @api.expect(register_model, validate=True)
     def post(self):
-        """ User registration """
-        # Grab the json data
-        register_data = request.get_json()
+        data = request.json
+        user, status_code = UserService.register_user(data)
+        if status_code == 200:
+            return api.marshal(user, data_resp), 200
+        if status_code == 400:
+            return api.marshal(user, error_response), 400
 
-        # Validate data
-        if (errors := register_schema.validate(register_data)) :
-            return validation_error(False, errors), 400
+@api.route("/login")
+class Login(Resource):
+    
+    @api.doc(
+        responses={
+            200: ("Request login Successfully",login_response),
+            400: ("Possible Messages:'Invalid email or password'",error_response),
+            403: "Access Denied!",
+            404: "Request Not Found",
+            500: "Unexpected Error Occurred"
+        },
+        description="login a user"                           
+    )
+    @api.expect(login_model, validate=True)
+    def post(self):
+        data = request.json
+        user, status_code = UserService.login_user(data)
+        if status_code == 200:
+            return api.marshal(user, login_response), 200
+        if status_code == 400:
+            return api.marshal(user, error_response), 400
 
-        return AuthService.register(register_data)
+@api.route("/profile")
+class Login(Resource):
+    
+    @api.doc(
+        responses={
+            200: ("Request login Successfully",login_response),
+            400: ("Possible Messages:'User not found'",error_response),
+            403: "Access Denied!",
+            404: "Request Not Found",
+            500: "Unexpected Error Occurred"
+        },
+        description="User profile"                           
+    )
+    @jwt_required()
+    def get(self):
+        user_id = get_jwt_identity()
+        user, status_code = UserService.get_user_profile(user_id)
+        if status_code == 200:
+            return api.marshal(user, login_response), 200
+        if status_code == 400:
+            return api.marshal(user, error_response), 400
+
